@@ -31,10 +31,13 @@ def _get(obj: Any, key: str, default: Any = None) -> Any:
         "unifi_create_firewall_group": {"kind": RenderKind.DETAIL},
         "unifi_update_firewall_group": {"kind": RenderKind.DETAIL},
         "unifi_delete_firewall_group": {"kind": RenderKind.DETAIL},
+        "unifi_create_firewall_zone": {"kind": RenderKind.DETAIL},
+        "unifi_update_firewall_zone": {"kind": RenderKind.DETAIL},
+        "unifi_delete_firewall_zone": {"kind": RenderKind.DETAIL},
     },
 )
 class FirewallMutationAckSerializer(Serializer):
-    """DETAIL ack for firewall policy + group mutations.
+    """DETAIL ack for firewall policy + group + zone mutations.
 
     ``create_*`` returns a dict or ``FirewallPolicy``; ``update_*`` /
     ``delete_*`` / ``toggle_*`` return ``bool``."""

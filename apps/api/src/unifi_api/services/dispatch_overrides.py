@@ -1584,6 +1584,9 @@ DISPATCH_ARG_TRANSLATORS: dict[str, ArgTranslatorSpec] = {
     "unifi_create_firewall_group": _spec(
         _pack_fields("group_data", frozenset({"name", "group_type", "group_members"})), "group_data"
     ),
+    "unifi_create_firewall_zone": _spec(_rename_and_drop(drop=frozenset({"confirm"})), "name"),
+    "unifi_update_firewall_zone": _spec(_rename_and_drop(drop=frozenset({"confirm"})), "zone_id", "name"),
+    "unifi_delete_firewall_zone": _spec(_rename_and_drop(drop=frozenset({"confirm"})), "zone_id"),
     "unifi_create_oon_policy": _spec(_translate_create_oon_policy, "policy_data"),
     "unifi_create_port_forward": _spec(_translate_create_port_forward, "rule_data"),
     "unifi_create_simple_port_forward": _spec(_translate_create_simple_port_forward, "rule_data"),
