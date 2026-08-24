@@ -860,6 +860,7 @@ type GatewaySettings {
   tcpSynSentTimeout: Int
   tcpTimeWaitTimeout: Int
   timeoutSettingPreference: String
+  echoServer: String
   unbindWanMonitors: Boolean
 }
 
@@ -1071,12 +1072,15 @@ type Network {
   networkIsolationEnabled: Boolean
   internetAccessEnabled: Boolean
   upnpLanEnabled: Boolean
+  firewallZoneId: String
   wanType: String
   wanNetworkgroup: String
   wanDnsPreference: String
   wanLoadBalanceType: String
   wanLoadBalanceWeight: Int
   wanFailoverPriority: Int
+  wanSla: String
+  reportWanEvent: Boolean
   wanSmartqEnabled: Boolean
   wanVlanEnabled: Boolean
   igmpProxyUpstream: Boolean
@@ -1525,6 +1529,12 @@ type PortProfile {
   stpBpduGuardEnabled: Boolean
   stpUplink: Boolean
   dot1xCtrl: String
+  stormctrlBcastEnabled: Boolean
+  stormctrlBcastRate: Int
+  stormctrlMcastEnabled: Boolean
+  stormctrlMcastRate: Int
+  stormctrlUcastEnabled: Boolean
+  stormctrlUcastRate: Int
 }
 
 """Paginated page of switch port profiles."""

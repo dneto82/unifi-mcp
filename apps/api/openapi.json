@@ -2915,6 +2915,17 @@
             ],
             "title": "Dns Verification"
           },
+          "echo_server": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Echo Server"
+          },
           "ftp_module": {
             "anyOf": [
               {
@@ -4396,6 +4407,17 @@
             "title": "Enabled",
             "type": "boolean"
           },
+          "firewall_zone_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firewall Zone Id"
+          },
           "id": {
             "anyOf": [
               {
@@ -4693,6 +4715,17 @@
             ],
             "title": "Purpose"
           },
+          "report_wan_event": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Wan Event"
+          },
           "subnet": {
             "anyOf": [
               {
@@ -4855,6 +4888,17 @@
               }
             ],
             "title": "Wan Networkgroup"
+          },
+          "wan_sla": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wan Sla"
           },
           "wan_smartq_enabled": {
             "anyOf": [
@@ -6771,6 +6815,72 @@
               }
             ],
             "title": "Poe Mode"
+          },
+          "stormctrl_bcast_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stormctrl Bcast Enabled"
+          },
+          "stormctrl_bcast_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stormctrl Bcast Rate"
+          },
+          "stormctrl_mcast_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stormctrl Mcast Enabled"
+          },
+          "stormctrl_mcast_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stormctrl Mcast Rate"
+          },
+          "stormctrl_ucast_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stormctrl Ucast Enabled"
+          },
+          "stormctrl_ucast_rate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stormctrl Ucast Rate"
           },
           "stp_bpdu_guard_enabled": {
             "anyOf": [
