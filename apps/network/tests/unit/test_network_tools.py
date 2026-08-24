@@ -422,6 +422,7 @@ class TestUpdateNetworkWanFields:
             "wan_load_balance_type": "weighted",
             "wan_load_balance_weight": 50,
             "wan_failover_priority": 1,
+            "wan_sla": "1.1.1.1",
             "wan_vlan_enabled": False,
             "mac_override_enabled": False,
         }

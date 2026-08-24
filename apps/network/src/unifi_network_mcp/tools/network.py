@@ -239,6 +239,7 @@ CONNECTIVITY_CRITICAL_WAN_FIELDS: frozenset[str] = frozenset(
         "wan_load_balance_type",
         "wan_load_balance_weight",
         "wan_failover_priority",
+        "wan_sla",
         "wan_vlan_enabled",
         "mac_override_enabled",
     }
@@ -251,7 +252,8 @@ CONNECTIVITY_CRITICAL_WAN_FIELDS: frozenset[str] = frozenset(
     "Pass only the fields you want to change — current values are automatically preserved. "
     "Basic: name, purpose ('corporate'/'vlan-only'), vlan_enabled (bool), vlan (str), "
     "ip_subnet (CIDR), enabled (bool), network_isolation_enabled (bool, corporate only), "
-    "internet_access_enabled (bool), upnp_lan_enabled (bool). "
+    "internet_access_enabled (bool), upnp_lan_enabled (bool), "
+    "firewall_zone_id (str, firewall zone ID — assigns the network to a zone). "
     "DHCP: dhcpd_enabled (bool), dhcpd_start (IP), dhcpd_stop (IP), dhcpd_leasetime (int seconds), auto_scale_enabled (bool), "
     "dhcpd_gateway (IP), dhcpd_gateway_enabled (bool), dhcp_relay_enabled (bool), "
     "dhcpd_conflict_checking (bool), dhcpguard_enabled (bool, requires dhcpd_ip_1), dhcpd_ip_1 (IP, trusted DHCP server for guard), dhcpd_boot_enabled (bool), dhcpd_boot_server (IP), dhcpd_boot_filename (str), dhcpd_tftp_server (str, DHCP opt 150). "
@@ -264,7 +266,8 @@ CONNECTIVITY_CRITICAL_WAN_FIELDS: frozenset[str] = frozenset(
     "WAN (gateway uplink, purpose='wan' networks): wan_type ('dhcp'/'static'/'pppoe'/'disabled'), "
     "wan_networkgroup ('WAN'/'WAN2'), wan_dns_preference ('auto'/'manual'), "
     "wan_load_balance_type ('failover-only'/'weighted'), wan_load_balance_weight (int 0-100), "
-    "wan_failover_priority (int), wan_smartq_enabled (bool), wan_vlan_enabled (bool), "
+    "wan_failover_priority (int), wan_sla (str, custom connectivity-monitor echo server), "
+    "report_wan_event (bool), wan_smartq_enabled (bool), wan_vlan_enabled (bool), "
     "igmp_proxy_upstream (bool), igmp_proxy_for (JSON: 'none' or list of network refs), "
     "mac_override_enabled (bool), wan_ip_aliases (list). "
     "WAN IPv6 (dual-stack; does not affect IPv4 internet): ipv6_enabled (bool), wan_type_v6 (str), "
