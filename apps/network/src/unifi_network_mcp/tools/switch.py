@@ -148,6 +148,30 @@ async def create_port_profile(
     dot1x_ctrl: Annotated[
         str, Field(description="802.1X control: 'force_authorized', 'auto', 'force_unauthorized'")
     ] = "",
+    stormctrl_bcast_enabled: Annotated[
+        Optional[bool],
+        Field(description="Enable broadcast storm control on ports using this profile"),
+    ] = None,
+    stormctrl_bcast_rate: Annotated[
+        Optional[int],
+        Field(description="Broadcast storm-control rate limit in kbps"),
+    ] = None,
+    stormctrl_mcast_enabled: Annotated[
+        Optional[bool],
+        Field(description="Enable multicast storm control on ports using this profile"),
+    ] = None,
+    stormctrl_mcast_rate: Annotated[
+        Optional[int],
+        Field(description="Multicast storm-control rate limit in kbps"),
+    ] = None,
+    stormctrl_ucast_enabled: Annotated[
+        Optional[bool],
+        Field(description="Enable unknown-unicast storm control on ports using this profile"),
+    ] = None,
+    stormctrl_ucast_rate: Annotated[
+        Optional[int],
+        Field(description="Unknown-unicast storm-control rate limit in kbps"),
+    ] = None,
     confirm: Annotated[
         bool,
         Field(description="When true, creates the profile. When false (default), returns a preview"),
@@ -169,6 +193,12 @@ async def create_port_profile(
         stp_bpdu_guard_enabled=stp_bpdu_guard_enabled,
         stp_uplink=stp_uplink,
         dot1x_ctrl=dot1x_ctrl,
+        stormctrl_bcast_enabled=stormctrl_bcast_enabled,
+        stormctrl_bcast_rate=stormctrl_bcast_rate,
+        stormctrl_mcast_enabled=stormctrl_mcast_enabled,
+        stormctrl_mcast_rate=stormctrl_mcast_rate,
+        stormctrl_ucast_enabled=stormctrl_ucast_enabled,
+        stormctrl_ucast_rate=stormctrl_ucast_rate,
     )
 
     if not confirm:
@@ -212,7 +242,10 @@ async def update_port_profile(
             "voice_networkconf_id, isolation (bool), "
             "poe_mode ('auto'/'off'/'pasv24'/'passthrough'), stp_port_mode (bool), "
             "stp_edge_state ('enabled'/'disabled'), stp_bpdu_guard_enabled (bool), stp_uplink (bool), "
-            "dot1x_ctrl ('force_authorized'/'auto'/'force_unauthorized'/'mac_based'/'multi_host'). "
+            "dot1x_ctrl ('force_authorized'/'auto'/'force_unauthorized'/'mac_based'/'multi_host'), "
+            "stormctrl_bcast_enabled (bool), stormctrl_bcast_rate (int kbps), "
+            "stormctrl_mcast_enabled (bool), stormctrl_mcast_rate (int kbps), "
+            "stormctrl_ucast_enabled (bool), stormctrl_ucast_rate (int kbps). "
             "The controller rewrites forward to agree with tagged_vlan_mgmt, so change them together. "
             "Port State (Active/Disabled) is a separate controller setting that this tool does not expose"
         ),

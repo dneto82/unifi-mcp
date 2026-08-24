@@ -239,3 +239,56 @@ class TestBuildCreatePayload:
         assert payload["tagged_vlan_mgmt"] == "block_all"
         assert payload["stp_uplink"] is False
         assert payload["tagged_networkconf_ids"] == []
+
+
+class TestStormControlFields:
+    STORMCTRL_FIELDS = (
+        "stormctrl_bcast_enabled",
+        "stormctrl_bcast_rate",
+        "stormctrl_mcast_enabled",
+        "stormctrl_mcast_rate",
+        "stormctrl_ucast_enabled",
+        "stormctrl_ucast_rate",
+    )
+
+    def test_storm_control_fields_are_mutable(self) -> None:
+        for field in self.STORMCTRL_FIELDS:
+            assert field in MUTABLE_FIELDS, f"Expected {field!r} in MUTABLE_FIELDS"
+
+    def test_from_controller_reads_storm_control_fields(self) -> None:
+        profile = from_controller(
+            {
+                "_id": "pp-1",
+                "name": "Storm",
+                "stormctrl_bcast_enabled": True,
+                "stormctrl_bcast_rate": 1000,
+                "stormctrl_mcast_enabled": False,
+                "stormctrl_ucast_rate": 2000,
+            }
+        )
+        assert profile.stormctrl_bcast_enabled is True
+        assert profile.stormctrl_bcast_rate == 1000
+        assert profile.stormctrl_mcast_enabled is False
+        assert profile.stormctrl_ucast_rate == 2000
+
+    def test_update_filter_preserves_storm_control(self) -> None:
+        result = to_controller_update(
+            {"stormctrl_bcast_enabled": False, "stormctrl_bcast_rate": 1000}
+        )
+        assert result["stormctrl_bcast_enabled"] is False
+        assert result["stormctrl_bcast_rate"] == 1000
+
+    def test_create_payload_includes_storm_control_when_supplied(self) -> None:
+        payload = build_create_payload(
+            name="Storm",
+            forward="native",
+            stormctrl_bcast_enabled=True,
+            stormctrl_bcast_rate=1000,
+        )
+        assert payload["stormctrl_bcast_enabled"] is True
+        assert payload["stormctrl_bcast_rate"] == 1000
+
+    def test_create_payload_omits_storm_control_when_unsupplied(self) -> None:
+        payload = build_create_payload(name="P", forward="native")
+        for field in self.STORMCTRL_FIELDS:
+            assert field not in payload

@@ -2667,6 +2667,30 @@
             "description": "PoE mode: 'auto' or 'off'",
             "type": "string"
           },
+          "stormctrl_bcast_enabled": {
+            "description": "Enable broadcast storm control on ports using this profile",
+            "type": "boolean"
+          },
+          "stormctrl_bcast_rate": {
+            "description": "Broadcast storm-control rate limit in kbps",
+            "type": "integer"
+          },
+          "stormctrl_mcast_enabled": {
+            "description": "Enable multicast storm control on ports using this profile",
+            "type": "boolean"
+          },
+          "stormctrl_mcast_rate": {
+            "description": "Multicast storm-control rate limit in kbps",
+            "type": "integer"
+          },
+          "stormctrl_ucast_enabled": {
+            "description": "Enable unknown-unicast storm control on ports using this profile",
+            "type": "boolean"
+          },
+          "stormctrl_ucast_rate": {
+            "description": "Unknown-unicast storm-control rate limit in kbps",
+            "type": "integer"
+          },
           "stp_bpdu_guard_enabled": {
             "description": "Shut the port if it receives a BPDU (Edge ports)",
             "type": "boolean"
@@ -6301,7 +6325,7 @@
       "input_schema": {
         "properties": {
           "profile_data": {
-            "description": "Dictionary of fields to update. Pass only the fields you want to change \u2014 current values are automatically preserved. Allowed keys: name, forward ('all'/'native'/'customize'), tagged_vlan_mgmt ('auto'/'block_all'/'custom'), native_networkconf_id, tagged_networkconf_ids (list), excluded_networkconf_ids (list), voice_networkconf_id, isolation (bool), poe_mode ('auto'/'off'/'pasv24'/'passthrough'), stp_port_mode (bool), stp_edge_state ('enabled'/'disabled'), stp_bpdu_guard_enabled (bool), stp_uplink (bool), dot1x_ctrl ('force_authorized'/'auto'/'force_unauthorized'/'mac_based'/'multi_host'). The controller rewrites forward to agree with tagged_vlan_mgmt, so change them together. Port State (Active/Disabled) is a separate controller setting that this tool does not expose",
+            "description": "Dictionary of fields to update. Pass only the fields you want to change \u2014 current values are automatically preserved. Allowed keys: name, forward ('all'/'native'/'customize'), tagged_vlan_mgmt ('auto'/'block_all'/'custom'), native_networkconf_id, tagged_networkconf_ids (list), excluded_networkconf_ids (list), voice_networkconf_id, isolation (bool), poe_mode ('auto'/'off'/'pasv24'/'passthrough'), stp_port_mode (bool), stp_edge_state ('enabled'/'disabled'), stp_bpdu_guard_enabled (bool), stp_uplink (bool), dot1x_ctrl ('force_authorized'/'auto'/'force_unauthorized'/'mac_based'/'multi_host'), stormctrl_bcast_enabled (bool), stormctrl_bcast_rate (int kbps), stormctrl_mcast_enabled (bool), stormctrl_mcast_rate (int kbps), stormctrl_ucast_enabled (bool), stormctrl_ucast_rate (int kbps). The controller rewrites forward to agree with tagged_vlan_mgmt, so change them together. Port State (Active/Disabled) is a separate controller setting that this tool does not expose",
             "type": "object"
           },
           "profile_id": {
