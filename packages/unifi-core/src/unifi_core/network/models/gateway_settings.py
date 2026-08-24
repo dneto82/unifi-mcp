@@ -118,6 +118,13 @@ class GatewaySettings(BaseModel):
     )
 
     # --- Misc ---
+    echo_server: Optional[str] = Field(
+        default=None,
+        description=(
+            "Connectivity-monitor echo server used for WAN failover health checks "
+            "(e.g. 'ping.ui.com' or a custom IP)"
+        ),
+    )
     unbind_wan_monitors: Optional[bool] = Field(default=None, description="Unbind WAN uplink monitors.")
 
     @field_validator("geo_ip_filtering_countries", mode="before")
@@ -209,6 +216,7 @@ def from_controller(raw: Any) -> GatewaySettings:
         tcp_syn_sent_timeout=_get(raw, "tcp_syn_sent_timeout"),
         tcp_time_wait_timeout=_get(raw, "tcp_time_wait_timeout"),
         timeout_setting_preference=_get(raw, "timeout_setting_preference"),
+        echo_server=_get(raw, "echo_server"),
         unbind_wan_monitors=_get(raw, "unbind_wan_monitors"),
     )
 

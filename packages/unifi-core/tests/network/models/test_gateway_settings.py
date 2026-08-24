@@ -118,8 +118,8 @@ class TestFieldSets:
         assert "site_id" not in MUTABLE_FIELDS
         assert "key" not in MUTABLE_FIELDS
 
-    def test_mutable_count_is_37(self):
-        assert len(MUTABLE_FIELDS) == 37
+    def test_mutable_count_is_38(self):
+        assert len(MUTABLE_FIELDS) == 38
 
     def test_readonly_fields(self):
         assert READ_ONLY_FIELDS == frozenset({"id", "site_id", "key"})
