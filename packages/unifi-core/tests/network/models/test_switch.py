@@ -272,9 +272,7 @@ class TestStormControlFields:
         assert profile.stormctrl_ucast_rate == 2000
 
     def test_update_filter_preserves_storm_control(self) -> None:
-        result = to_controller_update(
-            {"stormctrl_bcast_enabled": False, "stormctrl_bcast_rate": 1000}
-        )
+        result = to_controller_update({"stormctrl_bcast_enabled": False, "stormctrl_bcast_rate": 1000})
         assert result["stormctrl_bcast_enabled"] is False
         assert result["stormctrl_bcast_rate"] == 1000
 
