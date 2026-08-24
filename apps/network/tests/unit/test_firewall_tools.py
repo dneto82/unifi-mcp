@@ -1448,3 +1448,58 @@ async def test_list_firewall_policies_routes_through_typed_model():
     policy = result["policies"][0]
     assert policy["rule_index"] == 3000
     assert isinstance(policy["rule_index"], int)  # int (model coercion), not "3000" from raw
+
+
+class TestFirewallZoneWriteTools:
+    """Zone write tools: preview/confirm flow and manager delegation."""
+
+    @pytest.mark.asyncio
+    async def test_create_zone_preview(self) -> None:
+        from unifi_network_mcp.tools.firewall import create_firewall_zone
+
+        result = await create_firewall_zone(name="IoT", confirm=False)
+
+        assert result["success"] is True
+        assert result["preview"]["will_create"]["name"] == "IoT"
+        assert result["preview"]["will_create"]["networkIds"] == []
+
+    @pytest.mark.asyncio
+    async def test_create_zone_confirm(self) -> None:
+        from unifi_network_mcp.tools.firewall import create_firewall_zone
+
+        with patch("unifi_network_mcp.tools.firewall.firewall_manager") as mock_fm:
+            mock_fm.create_firewall_zone = AsyncMock(
+                return_value={"_id": "z1", "name": "IoT", "network_ids": [], "default_zone": False}
+            )
+            result = await create_firewall_zone(name="IoT", confirm=True)
+
+        assert result["success"] is True
+        assert result["zone"]["id"] == "z1"
+
+    @pytest.mark.asyncio
+    async def test_delete_zone_preview(self) -> None:
+        from unifi_network_mcp.tools.firewall import delete_firewall_zone
+
+        result = await delete_firewall_zone(zone_id="z1", confirm=False)
+
+        assert result["success"] is True
+        assert result["resource_id"] == "z1"
+
+    @pytest.mark.asyncio
+    async def test_delete_zone_confirm(self) -> None:
+        from unifi_network_mcp.tools.firewall import delete_firewall_zone
+
+        with patch("unifi_network_mcp.tools.firewall.firewall_manager") as mock_fm:
+            mock_fm.delete_firewall_zone = AsyncMock(return_value=True)
+            result = await delete_firewall_zone(zone_id="z1", confirm=True)
+
+        assert result["success"] is True
+
+    @pytest.mark.asyncio
+    async def test_update_zone_preview(self) -> None:
+        from unifi_network_mcp.tools.firewall import update_firewall_zone
+
+        result = await update_firewall_zone(zone_id="z1", name="IoT2", confirm=False)
+
+        assert result["success"] is True
+        assert result["preview"]["proposed"]["name"] == "IoT2"

@@ -1069,6 +1069,101 @@ class FirewallManager:
             logger.error("Error fetching firewall zones: %s", e, exc_info=True)
             raise
 
+    # ---- Firewall Zone CRUD (integration API) ----
+
+    async def _get_v2_zones_full(self) -> List[Dict[str, Any]]:
+        """Return the full V2 firewall-zone list (``/firewall/zone``).
+
+        ``get_firewall_zones()`` reads ``/firewall/zone-matrix``, which strips
+        ``external_id`` and ``default_zone``. Zone writes go through the
+        integration API (UUID ``id``) while ``unifi_list_firewall_zones`` and
+        ``firewall_zone_id`` use the V2 ``_id``, so the bridge needs the full
+        shape that carries ``external_id`` (== integration ``id``).
+        """
+        cache_key = f"{CACHE_PREFIX_FIREWALL_ZONES}_full_{self._connection.site}"
+        cached = self._connection.get_cached(cache_key)
+        if isinstance(cached, list):
+            return cached
+        if not await self._connection.ensure_connected():
+            raise ConnectionError("Not connected to controller")
+        api_request = ApiRequestV2(method="get", path="/firewall/zone")
+        resp = await self._connection.request(api_request)
+        data = resp if isinstance(resp, list) else (resp.get("data", []) if isinstance(resp, dict) else [])
+        data = [zone for zone in data if isinstance(zone, dict)]
+        self._connection._update_cache(cache_key, data)
+        return data
+
+    async def _resolve_zone_record(self, zone_id: str) -> Dict[str, Any]:
+        """Resolve a zone by V2 ``_id`` or integration UUID to its full V2 record."""
+        zones = await self._get_v2_zones_full()
+        for zone in zones:
+            if zone_id in {str(zone.get("_id")), str(zone.get("external_id")), str(zone.get("id"))}:
+                return zone
+        raise UniFiNotFoundError("firewall_zone", zone_id)
+
+    async def create_firewall_zone(self, name: str) -> Dict[str, Any]:
+        """Create a firewall zone via the integration API.
+
+        The V2 ``POST /firewall/zone`` silently no-ops, so writes use the
+        integration API (requires ``UNIFI_API_KEY``). Returns the zone in the
+        V2 read shape so the caller receives the 24-hex ``_id`` that
+        ``firewall_zone_id`` expects.
+        """
+        if not await self._connection.ensure_connected():
+            raise ConnectionError("Not connected to controller")
+        site_id = await self._get_integration_site_id()
+        created = await self._request_integration_api(
+            "post",
+            f"/v1/sites/{site_id}/firewall/zones",
+            data={"name": name, "networkIds": []},
+        )
+        integration_id = created.get("id") if isinstance(created, dict) else None
+        if not integration_id:
+            raise RuntimeError("Integration API did not return a firewall zone id")
+        self._connection._invalidate_cache(f"{CACHE_PREFIX_FIREWALL_ZONES}_{self._connection.site}")
+        self._connection._invalidate_cache(f"{CACHE_PREFIX_FIREWALL_ZONES}_full_{self._connection.site}")
+        zones = await self._get_v2_zones_full()
+        match = next((z for z in zones if str(z.get("external_id")) == str(integration_id)), None)
+        if match is None:
+            raise RuntimeError("Created firewall zone was not found in the V2 read-back")
+        return match
+
+    async def update_firewall_zone(self, zone_id: str, name: str) -> bool:
+        """Update a firewall zone's name via the integration API."""
+        if not await self._connection.ensure_connected():
+            raise ConnectionError("Not connected to controller")
+        zone = await self._resolve_zone_record(zone_id)
+        site_id = await self._get_integration_site_id()
+        integration_id = zone.get("external_id") or zone.get("_id")
+        await self._request_integration_api(
+            "put",
+            f"/v1/sites/{site_id}/firewall/zones/{integration_id}",
+            data={"name": name, "networkIds": list(zone.get("network_ids") or [])},
+        )
+        self._connection._invalidate_cache(f"{CACHE_PREFIX_FIREWALL_ZONES}_{self._connection.site}")
+        self._connection._invalidate_cache(f"{CACHE_PREFIX_FIREWALL_ZONES}_full_{self._connection.site}")
+        return True
+
+    async def delete_firewall_zone(self, zone_id: str) -> bool:
+        """Delete a firewall zone via the integration API.
+
+        ``SYSTEM_DEFINED`` zones (``default_zone`` in the V2 shape) are refused.
+        """
+        if not await self._connection.ensure_connected():
+            raise ConnectionError("Not connected to controller")
+        zone = await self._resolve_zone_record(zone_id)
+        if zone.get("default_zone"):
+            raise UniFiOperationError(f"Cannot delete system-defined firewall zone '{zone.get('name')}'")
+        site_id = await self._get_integration_site_id()
+        integration_id = zone.get("external_id") or zone.get("_id")
+        await self._request_integration_api(
+            "delete",
+            f"/v1/sites/{site_id}/firewall/zones/{integration_id}",
+        )
+        self._connection._invalidate_cache(f"{CACHE_PREFIX_FIREWALL_ZONES}_{self._connection.site}")
+        self._connection._invalidate_cache(f"{CACHE_PREFIX_FIREWALL_ZONES}_full_{self._connection.site}")
+        return True
+
     # ---- Legacy Firewall Rules and Groups (v1 REST) ----
 
     async def get_legacy_firewall_rules(self) -> List[Dict[str, Any]]:
