@@ -78,6 +78,7 @@ class Network:
     network_isolation_enabled: bool | None
     internet_access_enabled: bool | None
     upnp_lan_enabled: bool | None
+    firewall_zone_id: str | None
     # WAN uplink (purpose='wan' networks)
     wan_type: str | None
     wan_networkgroup: str | None
@@ -85,6 +86,8 @@ class Network:
     wan_load_balance_type: str | None
     wan_load_balance_weight: int | None
     wan_failover_priority: int | None
+    wan_sla: str | None
+    report_wan_event: bool | None
     wan_smartq_enabled: bool | None
     wan_vlan_enabled: bool | None
     igmp_proxy_upstream: bool | None
@@ -180,12 +183,15 @@ class Network:
             network_isolation_enabled=raw.get("network_isolation_enabled"),
             internet_access_enabled=raw.get("internet_access_enabled"),
             upnp_lan_enabled=raw.get("upnp_lan_enabled"),
+            firewall_zone_id=raw.get("firewall_zone_id"),
             wan_type=raw.get("wan_type"),
             wan_networkgroup=raw.get("wan_networkgroup"),
             wan_dns_preference=raw.get("wan_dns_preference"),
             wan_load_balance_type=raw.get("wan_load_balance_type"),
             wan_load_balance_weight=raw.get("wan_load_balance_weight"),
             wan_failover_priority=raw.get("wan_failover_priority"),
+            wan_sla=raw.get("wan_sla"),
+            report_wan_event=raw.get("report_wan_event"),
             wan_smartq_enabled=raw.get("wan_smartq_enabled"),
             wan_vlan_enabled=raw.get("wan_vlan_enabled"),
             igmp_proxy_upstream=raw.get("igmp_proxy_upstream"),
