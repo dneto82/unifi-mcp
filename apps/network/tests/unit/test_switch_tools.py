@@ -304,12 +304,12 @@ class TestUpdatePortProfilePreview:
 
         result = await update_port_profile(
             profile_id="pp1",
-            profile_data={"forward": "native", "stormctrl_bcast_enabled": True},
+            profile_data={"forward": "native", "attr_no_delete": True},
             confirm=False,
         )
 
         warnings = result.get("warnings") or []
-        assert any("stormctrl_bcast_enabled" in w for w in warnings), result
+        assert any("attr_no_delete" in w for w in warnings), result
 
     @pytest.mark.asyncio
     async def test_fully_unsupported_payload_names_the_fields(self) -> None:
@@ -317,10 +317,59 @@ class TestUpdatePortProfilePreview:
 
         result = await update_port_profile(
             profile_id="pp1",
-            profile_data={"stormctrl_bcast_enabled": True},
+            profile_data={"attr_no_delete": True},
             confirm=True,
         )
 
         assert result["success"] is False
-        assert "stormctrl_bcast_enabled" in result["error"]
+        assert "attr_no_delete" in result["error"]
         assert "not supported" in result["error"]
+
+
+class TestStormControlWritePath:
+    """Storm control (broadcast/multicast/unknown-unicast) is a writable field."""
+
+    @pytest.mark.asyncio
+    async def test_create_accepts_storm_control(self) -> None:
+        payload = await _create_preview(
+            name="Storm",
+            forward="native",
+            stormctrl_bcast_enabled=True,
+            stormctrl_bcast_rate=1000,
+            stormctrl_mcast_enabled=True,
+            stormctrl_mcast_rate=500,
+            stormctrl_ucast_enabled=False,
+            stormctrl_ucast_rate=2000,
+        )
+        assert payload["stormctrl_bcast_enabled"] is True
+        assert payload["stormctrl_bcast_rate"] == 1000
+        assert payload["stormctrl_mcast_enabled"] is True
+        assert payload["stormctrl_mcast_rate"] == 500
+        assert payload["stormctrl_ucast_enabled"] is False
+        assert payload["stormctrl_ucast_rate"] == 2000
+
+    @pytest.mark.asyncio
+    async def test_create_omits_storm_control_when_unset(self) -> None:
+        payload = await _create_preview(name="P", forward="native")
+        for key in (
+            "stormctrl_bcast_enabled",
+            "stormctrl_bcast_rate",
+            "stormctrl_mcast_enabled",
+            "stormctrl_mcast_rate",
+            "stormctrl_ucast_enabled",
+            "stormctrl_ucast_rate",
+        ):
+            assert key not in payload, f"{key!r} should not be sent when not requested"
+
+    @pytest.mark.asyncio
+    async def test_update_accepts_storm_control_without_warning(self) -> None:
+        from unifi_network_mcp.tools.switch import update_port_profile
+
+        result = await update_port_profile(
+            profile_id="pp1",
+            profile_data={"stormctrl_bcast_enabled": True, "stormctrl_bcast_rate": 1000},
+            confirm=False,
+        )
+        assert result["success"] is True, result
+        warnings = result.get("warnings") or []
+        assert not any("stormctrl" in w for w in warnings), result

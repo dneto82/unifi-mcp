@@ -121,8 +121,7 @@ class GatewaySettings(BaseModel):
     echo_server: Optional[str] = Field(
         default=None,
         description=(
-            "Connectivity-monitor echo server used for WAN failover health checks "
-            "(e.g. 'ping.ui.com' or a custom IP)"
+            "Connectivity-monitor echo server used for WAN failover health checks (e.g. 'ping.ui.com' or a custom IP)"
         ),
     )
     unbind_wan_monitors: Optional[bool] = Field(default=None, description="Unbind WAN uplink monitors.")

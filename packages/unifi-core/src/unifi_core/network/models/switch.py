@@ -113,6 +113,30 @@ class PortProfile(BaseModel):
         default=None,
         description="802.1X control: force_authorized, auto, force_unauthorized, mac_based, multi_host",
     )
+    stormctrl_bcast_enabled: Optional[bool] = Field(
+        default=None,
+        description="Enable broadcast storm control on ports using this profile",
+    )
+    stormctrl_bcast_rate: Optional[int] = Field(
+        default=None,
+        description="Broadcast storm-control rate limit in kbps",
+    )
+    stormctrl_mcast_enabled: Optional[bool] = Field(
+        default=None,
+        description="Enable multicast storm control on ports using this profile",
+    )
+    stormctrl_mcast_rate: Optional[int] = Field(
+        default=None,
+        description="Multicast storm-control rate limit in kbps",
+    )
+    stormctrl_ucast_enabled: Optional[bool] = Field(
+        default=None,
+        description="Enable unknown-unicast storm control on ports using this profile",
+    )
+    stormctrl_ucast_rate: Optional[int] = Field(
+        default=None,
+        description="Unknown-unicast storm-control rate limit in kbps",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -172,6 +196,12 @@ def from_controller(raw: Any) -> PortProfile:
         stp_bpdu_guard_enabled=_get(raw, "stp_bpdu_guard_enabled"),
         stp_uplink=_get(raw, "stp_uplink"),
         dot1x_ctrl=_get(raw, "dot1x_ctrl"),
+        stormctrl_bcast_enabled=_get(raw, "stormctrl_bcast_enabled"),
+        stormctrl_bcast_rate=_get(raw, "stormctrl_bcast_rate"),
+        stormctrl_mcast_enabled=_get(raw, "stormctrl_mcast_enabled"),
+        stormctrl_mcast_rate=_get(raw, "stormctrl_mcast_rate"),
+        stormctrl_ucast_enabled=_get(raw, "stormctrl_ucast_enabled"),
+        stormctrl_ucast_rate=_get(raw, "stormctrl_ucast_rate"),
     )
 
 
@@ -190,6 +220,12 @@ def build_create_payload(
     stp_bpdu_guard_enabled: Optional[bool] = None,
     stp_uplink: Optional[bool] = None,
     dot1x_ctrl: str = "",
+    stormctrl_bcast_enabled: Optional[bool] = None,
+    stormctrl_bcast_rate: Optional[int] = None,
+    stormctrl_mcast_enabled: Optional[bool] = None,
+    stormctrl_mcast_rate: Optional[int] = None,
+    stormctrl_ucast_enabled: Optional[bool] = None,
+    stormctrl_ucast_rate: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Build a controller create payload from the tool's flat parameters.
 
@@ -227,6 +263,18 @@ def build_create_payload(
         payload["stp_uplink"] = stp_uplink
     if dot1x_ctrl:
         payload["dot1x_ctrl"] = dot1x_ctrl
+    if stormctrl_bcast_enabled is not None:
+        payload["stormctrl_bcast_enabled"] = stormctrl_bcast_enabled
+    if stormctrl_bcast_rate is not None:
+        payload["stormctrl_bcast_rate"] = stormctrl_bcast_rate
+    if stormctrl_mcast_enabled is not None:
+        payload["stormctrl_mcast_enabled"] = stormctrl_mcast_enabled
+    if stormctrl_mcast_rate is not None:
+        payload["stormctrl_mcast_rate"] = stormctrl_mcast_rate
+    if stormctrl_ucast_enabled is not None:
+        payload["stormctrl_ucast_enabled"] = stormctrl_ucast_enabled
+    if stormctrl_ucast_rate is not None:
+        payload["stormctrl_ucast_rate"] = stormctrl_ucast_rate
     return payload
 
 
