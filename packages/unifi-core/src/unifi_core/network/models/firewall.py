@@ -7,7 +7,7 @@ Mirrors the Strawberry types in
   Mutable fields per FIREWALL_POLICY_V2_CREATE_SCHEMA.
 - ``FirewallGroup`` — create/delete for firewall address/port groups.
   Mutable fields: name, group_type, members.
-- ``FirewallZone``  — read-only zone shape (no mutable fields).
+- ``FirewallZone``  — zone shape with a mutable display name.
 - ``LegacyFirewallRule`` — read-only pre-zone-based rule shape. The legacy
   engine uses different field names, lowercase actions, and flat
   source/destination fields, so it cannot share ``FirewallRule``.
@@ -191,7 +191,7 @@ FIREWALLGROUP_READ_ONLY_FIELDS: frozenset[str] = frozenset(
 
 
 # ---------------------------------------------------------------------------
-# FirewallZone pydantic model (read-only)
+# FirewallZone pydantic model
 # ---------------------------------------------------------------------------
 
 
@@ -200,7 +200,7 @@ class FirewallZone(BaseModel):
 
     id: Optional[str] = Field(
         default=None,
-        description="Zone UUID",
+        description="V2 controller firewall-zone ObjectID (not an Integration API UUID)",
         json_schema_extra={"mutable": False},
     )
     name: Optional[str] = Field(
@@ -634,7 +634,7 @@ def to_zone_create(model: FirewallZone) -> Dict[str, Any]:
     """
     return {
         "name": model.name,
-        "networkIds": list(model.networks) if model.networks else [],
+        "networkIds": [],
     }
 
 

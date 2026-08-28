@@ -1457,7 +1457,7 @@ class TestFirewallZoneWriteTools:
     async def test_create_zone_preview(self) -> None:
         from unifi_network_mcp.tools.firewall import create_firewall_zone
 
-        result = await create_firewall_zone(name="IoT", confirm=False)
+        result = await create_firewall_zone(name="  IoT  ", confirm=False)
 
         assert result["success"] is True
         assert result["preview"]["will_create"]["name"] == "IoT"
@@ -1480,10 +1480,16 @@ class TestFirewallZoneWriteTools:
     async def test_delete_zone_preview(self) -> None:
         from unifi_network_mcp.tools.firewall import delete_firewall_zone
 
-        result = await delete_firewall_zone(zone_id="z1", confirm=False)
+        with patch("unifi_network_mcp.tools.firewall.firewall_manager") as mock_fm:
+            mock_fm.get_firewall_zone_by_id = AsyncMock(
+                return_value={"_id": "z1", "name": "IoT", "network_ids": ["network-1"]}
+            )
+            result = await delete_firewall_zone(zone_id="z1", confirm=False)
 
         assert result["success"] is True
         assert result["resource_id"] == "z1"
+        assert result["preview"]["will_delete"]["name"] == "IoT"
+        assert "Reassign member networks" in result["warnings"][1]
 
     @pytest.mark.asyncio
     async def test_delete_zone_confirm(self) -> None:
@@ -1499,7 +1505,50 @@ class TestFirewallZoneWriteTools:
     async def test_update_zone_preview(self) -> None:
         from unifi_network_mcp.tools.firewall import update_firewall_zone
 
-        result = await update_firewall_zone(zone_id="z1", name="IoT2", confirm=False)
+        with patch("unifi_network_mcp.tools.firewall.firewall_manager") as mock_fm:
+            mock_fm.get_firewall_zone_by_id = AsyncMock(return_value={"_id": "z1", "name": "IoT"})
+            result = await update_firewall_zone(zone_id="z1", name="IoT2", confirm=False)
 
         assert result["success"] is True
+        assert result["preview"]["current"]["name"] == "IoT"
         assert result["preview"]["proposed"]["name"] == "IoT2"
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("operation", ["update", "delete"])
+    async def test_system_zone_preview_is_refused(self, operation: str) -> None:
+        from unifi_network_mcp.tools.firewall import delete_firewall_zone, update_firewall_zone
+
+        with patch("unifi_network_mcp.tools.firewall.firewall_manager") as mock_fm:
+            mock_fm.get_firewall_zone_by_id = AsyncMock(
+                return_value={"_id": "z1", "name": "Internal", "default_zone": True}
+            )
+            if operation == "update":
+                result = await update_firewall_zone(zone_id="z1", name="Renamed", confirm=False)
+            else:
+                result = await delete_firewall_zone(zone_id="z1", confirm=False)
+
+        assert result == {
+            "success": False,
+            "error": f"Cannot {operation if operation == 'delete' else 'rename'} system-defined firewall zone 'Internal'.",
+        }
+
+    @pytest.mark.asyncio
+    async def test_update_zone_confirm_delegates_trimmed_name(self) -> None:
+        from unifi_network_mcp.tools.firewall import update_firewall_zone
+
+        with patch("unifi_network_mcp.tools.firewall.firewall_manager") as mock_fm:
+            mock_fm.update_firewall_zone = AsyncMock(return_value=True)
+            result = await update_firewall_zone(zone_id="z1", name="  Devices  ", confirm=True)
+
+        assert result["success"] is True
+        mock_fm.update_firewall_zone.assert_awaited_once_with("z1", "Devices")
+
+    @pytest.mark.asyncio
+    async def test_zone_names_reject_whitespace_only(self) -> None:
+        from unifi_network_mcp.tools.firewall import create_firewall_zone, update_firewall_zone
+
+        create_result = await create_firewall_zone(name="   ", confirm=False)
+        update_result = await update_firewall_zone(zone_id="z1", name="   ", confirm=False)
+
+        assert create_result == {"success": False, "error": "name is required"}
+        assert update_result == {"success": False, "error": "name is required"}

@@ -276,9 +276,9 @@ class TestFirewallZoneCreateUpdate:
         payload = to_zone_create(FirewallZone(name="IoT"))
         assert payload == {"name": "IoT", "networkIds": []}
 
-    def test_to_zone_create_passes_networks(self) -> None:
+    def test_to_zone_create_never_writes_read_only_networks(self) -> None:
         payload = to_zone_create(FirewallZone(name="IoT", networks=["n1", "n2"]))
-        assert payload == {"name": "IoT", "networkIds": ["n1", "n2"]}
+        assert payload == {"name": "IoT", "networkIds": []}
 
     def test_to_zone_update_filters_to_name(self) -> None:
         result = to_zone_update({"name": "IoT", "id": "x", "networks": []})

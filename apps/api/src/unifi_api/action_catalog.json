@@ -3160,7 +3160,7 @@
       "input_schema": {
         "properties": {
           "zone_id": {
-            "description": "The ID of the firewall zone (from unifi_list_firewall_zones)",
+            "description": "V2 controller ObjectID from unifi_list_firewall_zones; not an Integration API UUID",
             "type": "string"
           }
         },
@@ -6270,7 +6270,7 @@
             "type": "string"
           },
           "zone_id": {
-            "description": "The ID of the firewall zone (from unifi_list_firewall_zones)",
+            "description": "V2 controller ObjectID from unifi_list_firewall_zones; not an Integration API UUID",
             "type": "string"
           }
         },

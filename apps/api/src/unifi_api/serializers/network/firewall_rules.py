@@ -3,11 +3,13 @@
 Phase 6 PR2 Task 22 migrated the read shapes (firewall rules, firewall groups,
 firewall zones) to Strawberry types at
 ``unifi_api.graphql.types.network.firewall``. Only the cross-cutting mutation
-ack remains here — it covers create/update/delete/toggle for both firewall
-policies and firewall groups.
+ack remains here — it covers create/update/delete/toggle for firewall
+policies, firewall groups, and firewall zones.
 """
 
 from typing import Any
+
+from unifi_core.network.models.firewall import firewall_zone_from_controller
 
 from unifi_api.serializers._base import RenderKind, Serializer, register_serializer
 
@@ -41,6 +43,11 @@ class FirewallMutationAckSerializer(Serializer):
 
     ``create_*`` returns a dict or ``FirewallPolicy``; ``update_*`` /
     ``delete_*`` / ``toggle_*`` return ``bool``."""
+
+    def serialize_action(self, result, *, tool_name: str, redact_sensitive: bool = True) -> dict:
+        if tool_name == "unifi_create_firewall_zone" and isinstance(result, dict):
+            result = firewall_zone_from_controller(result).model_dump(exclude_none=True)
+        return super().serialize_action(result, tool_name=tool_name, redact_sensitive=redact_sensitive)
 
     @staticmethod
     def serialize(obj) -> dict:
