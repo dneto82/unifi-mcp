@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 
 class GatewaySettings(BaseModel):
@@ -226,4 +226,9 @@ def to_controller_update(fields: Dict[str, Any]) -> Dict[str, Any]:
     Read-only fields and unrecognised keys are dropped.
     ``None`` values are dropped; boolean ``False`` is preserved.
     """
-    return {k: v for k, v in fields.items() if k in MUTABLE_FIELDS and v is not None}
+    accepted = {k: v for k, v in fields.items() if k in MUTABLE_FIELDS and v is not None}
+    try:
+        model = GatewaySettings.model_validate(accepted, strict=True)
+    except ValidationError as error:
+        raise ValueError(error.errors()[0]["msg"]) from None
+    return model.model_dump(include=set(accepted), exclude_none=True)

@@ -1072,6 +1072,10 @@ type Network {
   networkIsolationEnabled: Boolean
   internetAccessEnabled: Boolean
   upnpLanEnabled: Boolean
+
+  """
+  V2 firewall-zone ID. These IDs are scoped to the V2 firewall/network tool family; do not pass Integration API firewall-zone UUIDs.
+  """
   firewallZoneId: String
   wanType: String
   wanNetworkgroup: String
@@ -1079,6 +1083,8 @@ type Network {
   wanLoadBalanceType: String
   wanLoadBalanceWeight: Int
   wanFailoverPriority: Int
+
+  """Controller WAN-SLA configuration ID for this uplink."""
   wanSla: String
   reportWanEvent: Boolean
   wanSmartqEnabled: Boolean

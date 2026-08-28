@@ -78,7 +78,12 @@ class Network:
     network_isolation_enabled: bool | None
     internet_access_enabled: bool | None
     upnp_lan_enabled: bool | None
-    firewall_zone_id: str | None
+    firewall_zone_id: str | None = strawberry.field(
+        description=(
+            "V2 firewall-zone ID. These IDs are scoped to the V2 firewall/network tool family; "
+            "do not pass Integration API firewall-zone UUIDs."
+        )
+    )
     # WAN uplink (purpose='wan' networks)
     wan_type: str | None
     wan_networkgroup: str | None
@@ -86,7 +91,7 @@ class Network:
     wan_load_balance_type: str | None
     wan_load_balance_weight: int | None
     wan_failover_priority: int | None
-    wan_sla: str | None
+    wan_sla: str | None = strawberry.field(description="Controller WAN-SLA configuration ID for this uplink.")
     report_wan_event: bool | None
     wan_smartq_enabled: bool | None
     wan_vlan_enabled: bool | None

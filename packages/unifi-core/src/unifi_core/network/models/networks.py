@@ -221,7 +221,10 @@ class Network(BaseModel):
     )
     firewall_zone_id: Optional[str] = Field(
         default=None,
-        description="Firewall zone ID this network belongs to (assigns the network to a zone)",
+        description=(
+            "V2 firewall-zone ID this network belongs to. These IDs are scoped to the V2 "
+            "firewall/network tool family — do not pass Integration API firewall-zone UUIDs"
+        ),
     )
     # --- WAN uplink (gateway interface; networkconf entries with purpose=wan) ---
     # NOTE: changing connectivity-critical WAN fields can interrupt internet access;
@@ -255,7 +258,7 @@ class Network(BaseModel):
     )
     wan_sla: Optional[str] = Field(
         default=None,
-        description="WAN SLA / connectivity-monitor target (custom echo server) used for failover health checks",
+        description="Controller WAN-SLA configuration ID used for this uplink's failover health checks",
     )
     report_wan_event: Optional[bool] = Field(
         default=None,

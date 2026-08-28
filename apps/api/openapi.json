@@ -4416,6 +4416,7 @@
                 "type": "null"
               }
             ],
+            "description": "V2 firewall-zone ID. These IDs are scoped to the V2 firewall/network tool family; do not pass Integration API firewall-zone UUIDs.",
             "title": "Firewall Zone Id"
           },
           "id": {
@@ -4898,6 +4899,7 @@
                 "type": "null"
               }
             ],
+            "description": "Controller WAN-SLA configuration ID for this uplink.",
             "title": "Wan Sla"
           },
           "wan_smartq_enabled": {

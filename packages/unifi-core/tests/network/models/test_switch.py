@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from unifi_core.network.models.switch import (
     MUTABLE_FIELDS,
     READ_ONLY_FIELDS,
@@ -263,12 +264,16 @@ class TestStormControlFields:
                 "stormctrl_bcast_enabled": True,
                 "stormctrl_bcast_rate": 1000,
                 "stormctrl_mcast_enabled": False,
+                "stormctrl_mcast_rate": 1500,
+                "stormctrl_ucast_enabled": True,
                 "stormctrl_ucast_rate": 2000,
             }
         )
         assert profile.stormctrl_bcast_enabled is True
         assert profile.stormctrl_bcast_rate == 1000
         assert profile.stormctrl_mcast_enabled is False
+        assert profile.stormctrl_mcast_rate == 1500
+        assert profile.stormctrl_ucast_enabled is True
         assert profile.stormctrl_ucast_rate == 2000
 
     def test_update_filter_preserves_storm_control(self) -> None:
@@ -290,3 +295,13 @@ class TestStormControlFields:
         payload = build_create_payload(name="P", forward="native")
         for field in self.STORMCTRL_FIELDS:
             assert field not in payload
+
+    @pytest.mark.parametrize("field", ("stormctrl_bcast_rate", "stormctrl_mcast_rate", "stormctrl_ucast_rate"))
+    @pytest.mark.parametrize("value", (-1, 14_880_001, True, 1.5, "100"))
+    def test_update_rejects_invalid_storm_control_rates(self, field: str, value: object) -> None:
+        with pytest.raises(ValueError):
+            to_controller_update({field: value})
+
+    @pytest.mark.parametrize("value", (0, 14_880_000))
+    def test_update_accepts_storm_control_rate_boundaries(self, value: int) -> None:
+        assert to_controller_update({"stormctrl_bcast_rate": value}) == {"stormctrl_bcast_rate": value}
